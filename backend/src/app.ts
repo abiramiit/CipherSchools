@@ -5,26 +5,28 @@ import { attemptRoutes } from './routes/attempt.routes';
 
 const app = express();
 
-const getAllowedOrigins = () => {
-    const urls = process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '';
-    const origins = urls.split(',').map(url => url.trim()).filter(Boolean);
-    origins.push('http://localhost:5173');
-    origins.push('http://localhost:4173');
-    return origins;
+const corsOptions = {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        const allowedOrigins = [
+            "http://localhost:5173",
+            process.env.FRONTEND_URL
+        ].filter(Boolean) as string[];
+
+        if (!origin) {
+            return callback(null, true);
+        }
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
 };
 
-app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin) return callback(null, true);
-        const allowedOrigins = getAllowedOrigins();
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true
-}));
+app.use(cors(corsOptions));
+app.options(/(.*)/, cors(corsOptions));
 
 app.use(express.json());
 
