@@ -1,8 +1,8 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     try {
-        const url = `${API_BASE_URL}${endpoint}`;
+        const url = `${API_URL}/api${endpoint}`;
         const response = await fetch(url, {
             ...options,
             headers: {

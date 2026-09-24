@@ -172,7 +172,7 @@ export default function Dashboard() {
                             </Link>
                         </div>
                     ))}
-                    {problems.length === 0 && (
+                    {(!problems || problems.length === 0) && (
                         <div className="col-span-full py-10 text-center border border-dashed border-border rounded-xl">
                             <p className="text-muted text-sm pb-4">No problems seeded in the database.</p>
                         </div>
