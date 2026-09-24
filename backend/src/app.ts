@@ -7,6 +7,7 @@ const app = express();
 
 const allowedOrigins = [
     "http://localhost:5173",
+    "https://cipher-schools-gcxb-oy07t7kig-abiramiits-projects.vercel.app",
     process.env.FRONTEND_URL
 ].filter(Boolean) as string[];
 
