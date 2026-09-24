@@ -9,6 +9,7 @@ const corsOptions = {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
         const allowedOrigins = [
             "http://localhost:5173",
+            "https://cipher-schools-gcxb.vercel.app",
             process.env.FRONTEND_URL
         ].filter(Boolean) as string[];
 
