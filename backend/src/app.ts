@@ -31,4 +31,16 @@ app.use(express.json());
 app.use('/api/problems', problemRoutes);
 app.use('/api/attempts', attemptRoutes);
 
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
+
+app.get('/api/health/db', async (req, res) => {
+    try {
+        const count = await prisma.problem.count();
+        res.json({ database: "connected", problemCount: count });
+    } catch (e: any) {
+        res.status(500).json({ database: "error", error: e.message });
+    }
+});
+
 export { app };

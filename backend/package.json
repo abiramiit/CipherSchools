@@ -8,9 +8,8 @@
   },
   "scripts": {
     "dev": "ts-node -T src/index.ts",
-    "build": "tsc",
-    "render-build": "npx prisma generate && tsc && npx prisma db push && npx ts-node seed.ts",
-    "start": "node dist/index.js",
+    "build": "npx prisma generate && tsc",
+    "start": "npx prisma db push --accept-data-loss && npx ts-node seed.ts && node dist/index.js",
     "test": "vitest run"
   },
   "keywords": [],
