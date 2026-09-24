@@ -15,7 +15,7 @@ export class ProblemController {
 
     async getById(req: Request, res: Response) {
         try {
-            const problem = await problemService.getProblemById(req.params.id);
+            const problem = await problemService.getProblemById(req.params.id as string);
             if (!problem) {
                 return res.status(404).json({ error: 'Problem not found' });
             }

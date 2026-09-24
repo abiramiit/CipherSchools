@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.attemptRoutes = void 0;
+const express_1 = require("express");
+const attempt_controller_1 = require("../controllers/attempt.controller");
+exports.attemptRoutes = (0, express_1.Router)();
+const controller = new attempt_controller_1.AttemptController();
+exports.attemptRoutes.post('/', controller.createAttempt);
+exports.attemptRoutes.get('/', controller.getAllAttempts.bind(controller));
+exports.attemptRoutes.get('/:id', controller.getAttempt);
+exports.attemptRoutes.get('/:id/evaluation', controller.getEvaluation.bind(controller));
+exports.attemptRoutes.patch('/:id', controller.updateDraft);
+exports.attemptRoutes.post('/:id/submit', controller.submitAttempt);
+exports.attemptRoutes.post('/:id/retry', controller.retryAttempt);
