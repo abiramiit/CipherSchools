@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  username  String    @unique
+  attempts  Attempt[]
+  createdAt DateTime  @default(now())
+}
+
+model Problem {
+  id               String    @id @default(uuid())
+  title            String
+  slug             String    @unique
+  difficulty       String
+  estimatedMinutes Int
+  description      String
+  requirements     String
+  concepts         String
+  evaluationCriteria String
+  attempts         Attempt[]
+  createdAt        DateTime  @default(now())
+}
+
+model Attempt {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  problemId   String
+  problem     Problem     @relation(fields: [problemId], references: [id])
+  submission  Submission?
+  evaluation  Evaluation?
+  status      String      // DRAFT, SUBMITTED, EVALUATING, COMPLETED, FAILED
+  score       Int?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Submission {
+  id        String   @id @default(uuid())
+  attemptId String   @unique
+  attempt   Attempt  @relation(fields: [attemptId], references: [id])
+  content   String   // JSON or text string containing draft state
+  createdAt DateTime @default(now())
+}
+
+model Evaluation {
+  id              String   @id @default(uuid())
+  attemptId       String   @unique
+  attempt         Attempt  @relation(fields: [attemptId], references: [id])
+  overallScore    Int
+  feedbackDetails String   // Stored JSON with detailed category scores and suggestions
+  evaluatedWithAI Boolean  @default(false)
+  createdAt       DateTime @default(now())
+}
