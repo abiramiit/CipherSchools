@@ -10,19 +10,18 @@ const problem_routes_1 = require("./routes/problem.routes");
 const attempt_routes_1 = require("./routes/attempt.routes");
 const app = (0, express_1.default)();
 exports.app = app;
+const allowedOrigins = [
+    "http://localhost:5173",
+    process.env.FRONTEND_URL
+].filter(Boolean);
 const corsOptions = {
     origin: (origin, callback) => {
-        const allowedOrigins = [
-            "http://localhost:5173",
-            process.env.FRONTEND_URL
-        ].filter(Boolean);
-        if (!origin) {
-            return callback(null, true);
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
         }
-        if (allowedOrigins.includes(origin)) {
-            return callback(null, true);
+        else {
+            callback(new Error(`CORS blocked origin: ${origin}`));
         }
-        return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
