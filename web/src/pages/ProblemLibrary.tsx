@@ -17,13 +17,21 @@ export default function ProblemLibrary() {
             method: 'POST',
             body: JSON.stringify({ problemId, userId: 'demo-learner' })
         });
-        if (!error && data?.attempt) {
-            navigate(`/practice/${data.attempt.id}`);
+
+        console.log("START PRACTICE RESPONSE DATA:", data, "ERROR:", error);
+
+        if (!error && data?.id) {
+            navigate(`/practice/${data.id}`);
         } else {
-            console.error('Failed to create attempt:', error);
+            console.error('Failed to create attempt. Data:', data, 'Error:', error);
             setStartingProblemId(null);
         }
     };
+
+    console.log('PROBLEM LIBRARY DATA:', problems);
+    console.log('PROBLEM LIBRARY LOADING:', isLoading);
+    console.log('PROBLEM LIBRARY ERROR:', error);
+    console.log('NUMBER OF PROBLEMS:', problems?.length);
 
     if (error) return <ApiErrorState error={error} onRetry={refetch} />;
 
@@ -73,7 +81,7 @@ export default function ProblemLibrary() {
                             <div className="p-6 flex flex-col flex-1">
                                 <div className="flex justify-between items-start mb-2">
                                     <h2 className="text-lg font-bold text-foreground group-hover:text-cyan transition-colors">{problem.title}</h2>
-                                    <span className={`text-[10px] uppercase font-mono font-bold tracking-widest px-2 py-0.5 border rounded ${problem.difficulty === 'HARD' ? 'bg-error/10 text-error border-error/20' : 'bg-accent/10 text-accent border-accent/20'}`}>
+                                    <span className={`text-[10px] uppercase font-mono font-bold tracking-widest px-2 py-0.5 border rounded ${problem.difficulty?.toLowerCase() === 'hard' ? 'bg-error/10 text-error border-error/20' : 'bg-accent/10 text-accent border-accent/20'}`}>
                                         {problem.difficulty}
                                     </span>
                                 </div>
@@ -84,10 +92,10 @@ export default function ProblemLibrary() {
 
                                 <div className="flex space-x-4 mb-6">
                                     <div className="flex items-center text-muted font-mono text-[10px] uppercase bg-background px-2 py-1 rounded border border-border">
-                                        <Clock size={12} className="mr-1.5" /> 45 MIN
+                                        <Clock size={12} className="mr-1.5" /> {problem.estimatedMinutes} MIN
                                     </div>
                                     <div className="flex items-center text-muted font-mono text-[10px] uppercase bg-background px-2 py-1 rounded border border-border">
-                                        <Box size={12} className="mr-1.5" /> OOP, SOLID
+                                        <Box size={12} className="mr-1.5" /> {problem.concepts}
                                     </div>
                                 </div>
 
@@ -96,7 +104,7 @@ export default function ProblemLibrary() {
                                     disabled={startingProblemId === problem.id}
                                     className="mt-auto block w-full bg-elevated border border-border text-center py-2.5 rounded text-[13px] font-bold text-foreground hover:bg-white/5 transition-colors shadow disabled:opacity-50"
                                 >
-                                    {startingProblemId === problem.id ? 'Starting Runtime...' : 'Start Practice →'}
+                                    {startingProblemId === problem.id ? 'Starting Runtime...' : 'Start Practice \u2192'}
                                 </button>
                             </div>
                         </div>
