@@ -7,6 +7,7 @@ const app = express();
 
 const allowedOrigins = [
     "https://cipher-schools-delta.vercel.app",
+    "https://cipher-schools-git-main-abiramiits-projects.vercel.app",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     process.env.FRONTEND_URL
@@ -20,7 +21,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options(/(.*)/, cors(corsOptions));
 
 app.use(express.json());
 
