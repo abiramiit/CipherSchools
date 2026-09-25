@@ -6,23 +6,17 @@ import { attemptRoutes } from './routes/attempt.routes';
 const app = express();
 
 const allowedOrigins = [
-    "http://localhost:5173",
-    "https://cipher-schools-gcxb-oy07t7kig-abiramiits-projects.vercel.app",
     "https://cipher-schools-delta.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
     process.env.FRONTEND_URL
 ].filter(Boolean) as string[];
 
 const corsOptions = {
-    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-            callback(null, true);
-        } else {
-            callback(new Error(`CORS blocked origin: ${origin}`));
-        }
-    },
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"]
+    allowedHeaders: ["Content-Type", "Authorization"]
 };
 
 app.use(cors(corsOptions));
