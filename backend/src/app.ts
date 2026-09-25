@@ -20,6 +20,13 @@ const corsOptions = {
     allowedHeaders: ["Content-Type", "Authorization"]
 };
 
+app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+        console.log('[CORS Diagnostic] OPTIONS Request -> Origin:', req.headers.origin);
+    }
+    next();
+});
+
 app.use(cors(corsOptions));
 
 app.use(express.json());
