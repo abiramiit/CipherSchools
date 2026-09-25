@@ -1,5 +1,4 @@
-const isNetlify = typeof window !== 'undefined' && window.location.hostname.includes('.netlify.app');
-const API_URL = isNetlify ? "" : (import.meta.env.VITE_API_URL || "");
+const API_URL = import.meta.env.PROD ? "" : (import.meta.env.VITE_API_URL || "");
 
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     try {
