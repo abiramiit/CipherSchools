@@ -4,24 +4,29 @@ import { app } from './app';
 dotenv.config();
 
 import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import path from 'path';
+
+const prisma = new PrismaClient({
+    datasources: {
+        db: {
+            url: `file:${path.join(__dirname, '../prisma/dev.db')}`
+        }
+    }
+});
 
 const PORT = process.env.PORT || 3001;
 
 async function startServer() {
-    console.log("================ DIAGNOSTICS ================");
-    console.log("Database provider: sqlite");
-    console.log("Current working directory:", process.cwd());
-    console.log("DATABASE_URL:", process.env.DATABASE_URL?.replace(/:[^:]*@/, ':***@') || "Not explicitly set in env");
-    try {
-        const count = await prisma.problem.count();
-        console.log("Problem count at startup:", count);
-    } catch (e: any) {
-        console.log("Database query failed at startup:", e.message);
-    }
-    console.log("=============================================");
-
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
+        console.log("BUILD VERSION: c120e74 + verify logs");
+        console.log("DATABASE_URL:", process.env.DATABASE_URL ? "configured" : "missing");
+        console.log("DATABASE PROVIDER: sqlite");
+        try {
+            const count = await prisma.problem.count();
+            console.log("PROBLEM COUNT:", count);
+        } catch (e: any) {
+            console.log("PROBLEM COUNT ERROR:", e.message);
+        }
         console.log(`Server running on port ${PORT}`);
     });
 }

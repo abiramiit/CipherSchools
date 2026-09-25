@@ -33,7 +33,15 @@ app.use('/api/problems', problemRoutes);
 app.use('/api/attempts', attemptRoutes);
 
 import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import path from 'path';
+
+const prisma = new PrismaClient({
+    datasources: {
+        db: {
+            url: `file:${path.join(__dirname, '../prisma/dev.db')}`
+        }
+    }
+});
 
 app.get('/api/health/db', async (req, res) => {
     try {

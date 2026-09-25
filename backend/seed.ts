@@ -1,5 +1,13 @@
 import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import path from 'path';
+
+const prisma = new PrismaClient({
+    datasources: {
+        db: {
+            url: `file:${path.join(__dirname, 'prisma/dev.db')}`
+        }
+    }
+});
 
 async function main() {
     const problems = [
