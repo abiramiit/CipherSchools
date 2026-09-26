@@ -6,21 +6,15 @@ dotenv.config();
 import { PrismaClient } from '@prisma/client';
 import path from 'path';
 
-const prisma = new PrismaClient({
-    datasources: {
-        db: {
-            url: `file:${path.join(__dirname, '../prisma/dev.db')}`
-        }
-    }
-});
+const prisma = new PrismaClient();
 
 const PORT = process.env.PORT || 3001;
 
 async function startServer() {
-    app.listen(PORT, async () => {
+    app.listen(Number(PORT), '0.0.0.0', async () => {
         console.log("BUILD VERSION: c120e74 + verify logs");
         console.log("DATABASE_URL:", process.env.DATABASE_URL ? "configured" : "missing");
-        console.log("DATABASE PROVIDER: sqlite");
+        console.log("DATABASE PROVIDER: postgresql");
         try {
             const count = await prisma.problem.count();
             console.log("PROBLEM COUNT:", count);

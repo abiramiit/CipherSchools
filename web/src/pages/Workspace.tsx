@@ -14,30 +14,58 @@ export default function Workspace() {
     const [isSaving, setIsSaving] = useState(false);
     const [initialized, setInitialized] = useState(false);
 
-    const attempt = data?.attempt;
+    const attempt = data;
 
+    console.log('[Workspace] id:', id);
+    console.log('[Workspace] endpoint:', id && id !== 'new' ? `/attempts/${id}` : '');
+    console.log('[Workspace] data:', data);
+    console.log('[Workspace] attempt:', attempt);
+    console.log('[Workspace] isLoading:', isLoading);
+    console.log('[Workspace] error:', error);
+
+    // Initialize code from the remote submission
     useEffect(() => {
-        if (attempt?.code && !initialized) {
-            setCode(attempt.code);
+        if (attempt && !initialized) {
+            setCode(attempt.submission?.content || '');
             setInitialized(true);
         }
     }, [attempt, initialized]);
 
-    const handleSave = async () => {
+    const handleSave = async (codeToSave: string) => {
         if (!id || id === 'new') return;
         setIsSaving(true);
-        await fetchApi(`/attempts/${id}`, {
-            method: 'PUT',
-            body: JSON.stringify({ code })
-        });
-        setIsSaving(false);
+        try {
+            await fetchApi(`/attempts/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ content: codeToSave })
+            });
+        } finally {
+            setIsSaving(false);
+        }
     };
+
+    // Debounced Autosave
+    useEffect(() => {
+        if (!initialized) return;
+        const timer = setTimeout(() => {
+            handleSave(code);
+        }, 1000);
+        return () => clearTimeout(timer);
+    }, [code, initialized]);
 
     const handleSubmit = async () => {
         if (!id || id === 'new') return;
-        await handleSave();
-        await fetchApi(`/attempts/${id}/submit`, { method: 'POST' });
-        navigate(`/feedback/${id}`);
+        try {
+            await handleSave(code);
+            const res = await fetchApi(`/attempts/${id}/submit`, { method: 'POST' });
+            if (res.error) {
+                alert(`Submit failed: ${res.error}`);
+                return;
+            }
+            navigate(`/feedback/${id}`);
+        } catch (err: any) {
+            alert(`Unexpected error: ${err.message}`);
+        }
     };
 
     if (error) return <ApiErrorState error={error} onRetry={refetch} />;
@@ -115,7 +143,6 @@ export default function Workspace() {
                         value={code}
                         onChange={(e) => {
                             setCode(e.target.value);
-                            handleSave();
                         }}
                         style={{ fontFamily: "var(--font-mono)" }}
                         placeholder={`// Define Classes, Interfaces, Enums...\n\nclass ${attempt.problem?.title?.replace(/\s+/g, '')} {\n\n}`}

@@ -16,8 +16,8 @@ export default function ProblemDetail() {
             method: 'POST',
             body: JSON.stringify({ problemId: id, userId: 'demo-learner' })
         });
-        if (!error && data?.attempt) {
-            navigate(`/practice/${data.attempt.id}`);
+        if (!error && data?.id) {
+            navigate(`/practice/${data.id}`);
         } else {
             console.error('Failed to start attempt', error);
             setStarting(false);

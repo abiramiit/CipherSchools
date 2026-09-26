@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: cipherschools-backend
+    env: node
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cipherschools-postgres
+          property: connectionString
+      - key: FRONTEND_URL
+        value: https://cipher-schools-delta.vercel.app
+
+databases:
+  - name: cipherschools-postgres
+    databaseName: cipherschools
+    user: admin

@@ -5,7 +5,7 @@ export class AttemptService {
     async createAttempt(problemId: string, userId: string) {
         let user = await prisma.user.findUnique({ where: { id: userId } });
         if (!user) {
-            user = await prisma.user.create({ data: { id: userId, username: 'dev-user' } });
+            user = await prisma.user.create({ data: { id: userId, username: `dev-user-${userId}` } });
         }
 
         return prisma.attempt.create({
