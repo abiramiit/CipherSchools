@@ -34,29 +34,51 @@ export class AttemptService {
     }
 
     async updateDraft(attemptId: string, content: string) {
+        console.log('[updateDraft service] attemptId:', attemptId);
+        console.log('[updateDraft service] content length:', content?.length);
         const attempt = await prisma.attempt.findUnique({ where: { id: attemptId } });
         if (!attempt) throw new Error('Attempt not found');
 
-        await prisma.submission.upsert({
+        const savedSubmission = await prisma.submission.upsert({
             where: { attemptId },
             update: { content },
             create: { attemptId, content }
         });
+        console.log('[updateDraft service] saved submission:', savedSubmission);
         return this.getAttempt(attemptId);
     }
 
-    async submitAttempt(attemptId: string, content: string) {
-        if (!content || content.trim().length === 0) {
+    async submitAttempt(attemptId: string, content?: string) {
+        let finalContent = content;
+
+        const attemptRecord = await prisma.attempt.findUnique({
+            where: { id: attemptId },
+            include: { submission: true }
+        });
+
+        console.log('[submit service] attemptId:', attemptId);
+        console.log('[submit service] submission:', attemptRecord?.submission);
+        console.log('[submit service] fetched content length:', attemptRecord?.submission?.content?.length);
+        console.log('[submit service] arg content length:', content?.length);
+
+        if (!attemptRecord) throw new Error('Attempt not found');
+
+        if (content === undefined && attemptRecord.submission?.content) {
+            finalContent = attemptRecord.submission.content;
+        }
+
+        if (finalContent === undefined || finalContent.trim().length === 0) {
+            console.log('[submit service] Error: Submission cannot be empty');
             throw new Error('Submission cannot be empty');
         }
 
-        const attemptRecord = await prisma.attempt.findUnique({ where: { id: attemptId } });
-        if (!attemptRecord) throw new Error('Attempt not found');
         if (attemptRecord.status !== 'DRAFT' && attemptRecord.status !== 'FAILED') {
             throw new Error('Attempt is already submitted or evaluating');
         }
 
-        await this.updateDraft(attemptId, content);
+        if (content !== undefined) {
+            await this.updateDraft(attemptId, content);
+        }
 
         const attempt = await prisma.attempt.update({
             where: { id: attemptId },

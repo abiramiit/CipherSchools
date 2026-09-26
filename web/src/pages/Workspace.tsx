@@ -32,13 +32,14 @@ export default function Workspace() {
     }, [attempt, initialized]);
 
     const handleSave = async (codeToSave: string) => {
-        if (!id || id === 'new') return;
+        if (!id || id === 'new') return { error: 'Invalid ID' };
         setIsSaving(true);
         try {
-            await fetchApi(`/attempts/${id}`, {
+            const result = await fetchApi(`/attempts/${id}`, {
                 method: 'PATCH',
                 body: JSON.stringify({ content: codeToSave })
             });
+            return result;
         } finally {
             setIsSaving(false);
         }
@@ -56,8 +57,18 @@ export default function Workspace() {
     const handleSubmit = async () => {
         if (!id || id === 'new') return;
         try {
-            await handleSave(code);
-            const res = await fetchApi(`/attempts/${id}/submit`, { method: 'POST' });
+            console.log('[Workspace] code length:', code.length);
+            const saveRes = await handleSave(code);
+            console.log('[Workspace] PATCH response:', saveRes);
+            if (saveRes?.error) {
+                alert(`Save failed before submit: ${saveRes.error}`);
+                return;
+            }
+            console.log('[Workspace] submitting attempt:', id);
+            const res = await fetchApi(`/attempts/${id}/submit`, {
+                method: 'POST',
+                body: JSON.stringify({ content: code })
+            });
             if (res.error) {
                 alert(`Submit failed: ${res.error}`);
                 return;

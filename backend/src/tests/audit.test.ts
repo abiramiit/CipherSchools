@@ -76,6 +76,20 @@ describe('FINAL ENGINEERING AUDIT - DesignForge', () => {
         expect(res2.status).toBe(400);
     });
 
+    it('5.5 POST /api/attempts/:id/submit - Submission from DB fallback', async () => {
+        // Create fresh attempt
+        const postRes = await request(app).post('/api/attempts').send({ problemId, userId: 'testId3' });
+        const newId = postRes.body.id;
+
+        // PATCH it
+        await request(app).patch(`/api/attempts/${newId}`).send({ content: 'class ParkingLot {}' });
+
+        // POST without content
+        const submitRes = await request(app).post(`/api/attempts/${newId}/submit`);
+        expect(submitRes.status).toBe(200);
+        expect(submitRes.body.status).toBe('EVALUATING');
+    });
+
     // Case D: Extensibility (Strategy pattern logic check directly on Engine)
     it('CASE D: Submission containing interfaces and strategies', async () => {
         const engine = new DeterministicEvaluationEngine();

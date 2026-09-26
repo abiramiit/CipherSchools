@@ -37,6 +37,8 @@ export class AttemptController {
 
     async updateDraft(req: Request, res: Response) {
         try {
+            console.log('[updateDraft controller] attemptId:', req.params.id);
+            console.log('[updateDraft controller] body content length:', req.body?.content?.length);
             const attempt = await attemptService.updateDraft((req.params.id as string), req.body.content);
             res.json(attempt);
         } catch (error) {
@@ -46,7 +48,9 @@ export class AttemptController {
 
     async submitAttempt(req: Request, res: Response) {
         try {
-            const attempt = await attemptService.submitAttempt((req.params.id as string), req.body.content);
+            console.log('[submitAttempt controller] attemptId:', req.params.id);
+            console.log('[submitAttempt controller] body content length:', req.body?.content?.length);
+            const attempt = await attemptService.submitAttempt((req.params.id as string), req.body?.content);
             res.json(attempt);
         } catch (error) {
             res.status(400).json({ error: (error as Error).message });
