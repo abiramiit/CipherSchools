@@ -40,6 +40,39 @@ export class TextSubmissionParser implements SubmissionParser {
             });
         }
 
+        // Fallback: If no classes were detected via strict keyword parsing, attempt to parse plain-text lists
+        if (classes.length === 0) {
+            const lines = content.split('\n');
+            let currentClass: ClassMetadata | null = null;
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+
+                const isIndented = line.startsWith(' ') || line.startsWith('\t');
+                const isBullet = trimmed.startsWith('-') || trimmed.startsWith('*');
+
+                // If it's a root alphanumeric word, treat it as a Class definition
+                if (!isIndented && !isBullet && /^[A-Za-z][A-Za-z0-9_]*$/.test(trimmed)) {
+                    if (currentClass) classes.push(currentClass);
+                    currentClass = { name: trimmed, methods: [] };
+                }
+                // Alternatively, if they wrote something like "Entity: User", try to capture it
+                else if (!isIndented && /^[A-Za-z][A-Za-z0-9_]*:$/.test(trimmed)) {
+                    if (currentClass) classes.push(currentClass);
+                    currentClass = { name: trimmed.replace(':', ''), methods: [] };
+                }
+                else if (currentClass) {
+                    const methodsRegex = /([A-Za-z0-9_]+)\s*\(/g;
+                    let m;
+                    while ((m = methodsRegex.exec(trimmed)) !== null) {
+                        currentClass.methods.push(m[1]);
+                    }
+                }
+            }
+            if (currentClass) classes.push(currentClass);
+        }
+
         return {
             classes,
             mentionedPatterns,
